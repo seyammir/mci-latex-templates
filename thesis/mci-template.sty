@@ -1,0 +1,204 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{mci-template}[2026/11/22 Reusable MCI report/thesis support]
+\savegeometry{mci-creator-front}
+\RequirePackage{iftex}
+\ifLuaTeX\else
+  \PackageError{mci-template}{Use LuaLaTeX}{Compile with latexmk main.tex.}
+\fi
+% Typography and packages
+\RequirePackage{fontspec}
+\setmainfont{TeX Gyre Heros}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{Latin Modern Mono}
+\RequirePackage{tabularx}
+\RequirePackage{booktabs}
+\RequirePackage{longtable}
+\RequirePackage{microtype}
+\RequirePackage{setspace}
+\RequirePackage{ragged2e}
+\RequirePackage{csquotes}
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\RequirePackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\RequirePackage[unicode,hidelinks,pdfpagelabels]{hyperref}
+\RequirePackage{bookmark}
+% Map Unicode punctuation to T1 text commands in front matter.
+\RequirePackage{newunicodechar}
+\newunicodechar{ß}{\ss}
+\newunicodechar{–}{\textendash}
+\newunicodechar{—}{\textemdash}
+\newunicodechar{‘}{\textquoteleft}
+\newunicodechar{’}{\textquoteright}
+\newunicodechar{“}{\textquotedblleft}
+\newunicodechar{”}{\textquotedblright}
+\newunicodechar{„}{\quotedblbase}
+
+% Language and document settings
+\@ifundefined{ifMCIBioscience}{\newif\ifMCIBioscience}{}
+\DeclareRobustCommand{\MCIText}[2]{%
+  \ifthenelse{\equal{\Global@Language}{DE}}{#1}{#2}}
+\ifthenelse{\equal{\Global@Language}{DE}}{%
+  \sisetup{locale=DE,separate-uncertainty=true}%
+  \pgfplotsset{/pgf/number format/use comma}%
+  \pdfstringdefDisableCommands{\def\MCIText#1#2{#1}}%
+}{%
+  \sisetup{locale=US,separate-uncertainty=true}%
+  \pdfstringdefDisableCommands{\def\MCIText#1#2{#2}}%
+}
+\addto\captionsngerman{%
+  \renewcommand{\figurename}{Abb.}%
+  \renewcommand{\tablename}{Tab.}%
+}
+\addto\captionsenglish{%
+  \renewcommand{\figurename}{Fig.}%
+  \renewcommand{\tablename}{Tab.}%
+}
+\KOMAoptions{listof=totoc,bibliography=totoc,numbers=noenddot}
+\setstretch{1.2}
+\geometry{a4paper,left=28mm,right=25mm,top=25mm,bottom=25mm,
+          headheight=16pt,headsep=8mm,footskip=12mm}
+\captionsetup{font=small,labelfont=normalfont}
+\floatsetup[table]{capposition=top}
+\floatsetup[figure]{capposition=bottom}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\setlength{\emergencystretch}{1em}
+\hypersetup{pdftitle={\Global@Title},pdfauthor={\Student@Name}}
+
+% Author identity and running headings
+\renewcommand*{\Global@StudentName}{\Student@Name}
+\clearpairofpagestyles
+\automark[section]{chapter}
+\ihead{\truncate{0.46\textwidth}{\leftmark}}
+\ohead{\truncate{0.46\textwidth}{\rightmark}}
+\ifoot*{\truncate{0.70\textwidth}{\Student@Name}}
+\ofoot*{\pagemark}
+
+% Writing helpers
+\NewDocumentCommand{\offen}{m}{\textit{OFFEN: #1}}
+\NewDocumentCommand{\figref}{m}{\MCIText{Abb.}{Fig.}~\ref{#1}}
+\NewDocumentCommand{\tabref}{m}{\MCIText{Tab.}{Tab.}~\ref{#1}}
+\NewDocumentCommand{\eqnref}{m}{\MCIText{Gl.}{Eq.}~\eqref{#1}}
+\NewDocumentCommand{\mcicite}{o m}{%
+  \ifMCIBioscience
+    \IfNoValueTF{#1}{\cite{#2}}{\cite[#1]{#2}}%
+  \else
+    \textsuperscript{\IfNoValueTF{#1}{\cite{#2}}{\cite[#1]{#2}}}%
+  \fi}
+\NewDocumentCommand{\mciquote}{m}{\enquote{\textit{#1}}}
+\NewDocumentEnvironment{mcilongquote}{}{%
+  \begin{quote}\setstretch{1.0}\itshape
+}{\end{quote}}
+\NewDocumentEnvironment{mcimethods}{}{%
+  \par\begingroup\ifMCIBioscience\RaggedRight\else\justifying\fi
+}{\par\endgroup}
+
+% Front matter, directories and page numbering
+\newcommand*{\mci@selectlanguage}{%
+  \MCIText{\selectlanguage{ngerman}}{\selectlanguage{english}}}
+\newcommand*{\mci@cover}{%
+  \mci@selectlanguage
+  \hypersetup{pageanchor=false}%
+  \MakeTitlePage
+  \pagenumbering{Roman}%
+  \hypersetup{pageanchor=true}%
+  \pagestyle{plain.scrheadings}%
+  \justifying}
+\newcounter{mci@nextroman}
+\RenewDocumentCommand{\listoffigures}{}{%
+  \addchap{\listfigurename}\@starttoc{lof}}
+\RenewDocumentCommand{\listoftables}{}{%
+  \addchap{\listtablename}\@starttoc{lot}}
+\newcommand*{\mci@mainmatter}{%
+  \clearpage
+  \setcounter{mci@nextroman}{\value{page}}%
+  \pagenumbering{arabic}%
+  \mci@selectlanguage
+  \pagestyle{scrheadings}%
+  \justifying}
+\newcommand*{\MCIPrintBackMatter}{%
+  \clearpage
+  \pagenumbering{Roman}%
+  \setcounter{page}{\value{mci@nextroman}}%
+  \pagestyle{scrheadings}%
+  \ifthenelse{\equal{\Thesis@ToC@Figures}{set}}{\listoffigures}{}%
+  \ifthenelse{\equal{\Thesis@ToC@Tables}{set}}{\listoftables}{}%
+  \clearpage}
+
+% Class-native thesis front matter
+\newif\ifmci@creatorfront
+% Override fontspec encoding hooks only inside front matter.
+\AddToHook{rmfamily}[mci-creator-front]{%
+  \ifmci@creatorfront\fontencoding{T1}\fi}
+\AddToHook{sffamily}[mci-creator-front]{%
+  \ifmci@creatorfront\fontencoding{T1}\fi}
+\AddToHook{ttfamily}[mci-creator-front]{%
+  \ifmci@creatorfront\fontencoding{T1}\fi}
+\DeclareHookRule{rmfamily}{mci-creator-front}{after}{fontspec}
+\DeclareHookRule{sffamily}{mci-creator-front}{after}{fontspec}
+\DeclareHookRule{ttfamily}{mci-creator-front}{after}{fontspec}
+\newcommand*{\mci@creatorfonts}{%
+  \mci@creatorfronttrue
+  \renewcommand*{\encodingdefault}{T1}%
+  \renewcommand*{\rmdefault}{Gudea-TLF}%
+  \renewcommand*{\sfdefault}{cmss}%
+  \renewcommand*{\ttdefault}{cmtt}%
+  \renewcommand*{\bfdefault}{bx}%
+  \normalfont\setstretch{1.5}}
+\newcommand*{\ps@mcifront}{%
+  \let\@oddhead\@empty\let\@evenhead\@empty
+  \def\@oddfoot{\hfil\normalfont\thepage\hfil}%
+  \let\@evenfoot\@oddfoot}
+\newcommand*{\mci@creatorabstract}[3]{%
+  \begin{otherlanguage}{#1}
+    \renewcommand*{\abstractname}{#2}%
+    \begin{abstract}
+      \thispagestyle{mcifront}%
+      \input{#3}%
+    \end{abstract}
+  \end{otherlanguage}}
+\def\Thesis@Bibliography@Print{unset}%
+\RenewDocumentCommand{\TableOfContents}{}{%
+  \ifthenelse{\equal{\Thesis@ToC@Primary}{set}}{%
+    \begingroup
+      \renewcommand*{\@pnumwidth}{3em}%
+      \renewcommand*{\@tocrmarg}{4em}%
+      \tableofcontents
+    \endgroup
+  }{}%
+}
+\RenewDocumentCommand{\Th@Abstracts}{}{%
+  \ifthenelse{\equal{\Global@Language}{DE}}{%
+    \mci@creatorabstract{ngerman}{\Large Zusammenfassung}%
+      {aux-\jobname-abstract-de.abs}%
+  }{}%
+  \mci@creatorabstract{english}{Abstract}{aux-\jobname-abstract-en.abs}%
+}
+\RenewDocumentCommand{\Th@Acknowledgments}{}{%
+  \ifthenelse{\equal{\Global@Language}{DE}}{%
+    \mci@creatorabstract{ngerman}{\Large Danksagung}%
+      {aux-\jobname-acknowledgement.ack}%
+  }{%
+    \mci@creatorabstract{english}{\Large Acknowledgements}%
+      {aux-\jobname-acknowledgement.ack}%
+  }}
+\RenewDocumentCommand{\Th@Preamble}{O{}}{%
+  \savegeometry{mci-thesis-body}%
+  \begingroup
+    \mci@creatorfonts
+    \mci@cover
+    \loadgeometry{mci-creator-front}%
+    \pagestyle{mcifront}%
+    \renewcommand*{\chapterpagestyle}{mcifront}%
+    \Th@ThesisEmbargoRequest[#1]%
+    \Th@DeclarationOfNovelty
+    \ifacknowledgments\Th@Acknowledgments\fi
+    \Th@Abstracts
+    \TableOfContents
+    \clearpage
+  \endgroup
+  \loadgeometry{mci-thesis-body}%
+  \mci@mainmatter}
+
+\endinput

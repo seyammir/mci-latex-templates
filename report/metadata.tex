@@ -1,0 +1,21 @@
+% Preserve the % line endings in this configuration.
+\newif\ifMCIBioscience
+\MCIBiosciencefalse
+
+\SetMCI{%
+  StudentName = {Name = {OFFEN: Vorname Nachname}},%
+  StudentID   = {OFFEN: Matrikelnummer},%
+  Degree      = BSc,% BSc or MSc
+  Language    = DE,% EN only if permitted; translate the sample content too.
+  Department  = MECH,% Check applicability for another department.
+  Title       = {OFFEN: Titel des Berichts},%
+  Report = {%
+    Lecture = {OFFEN: Lehrveranstaltung},%
+    Cohort  = {OFFEN: Jahrgang},%
+    Mode    = Lab,% Lab or Assignment
+    Group   = {OFFEN: Gruppe},% Use unset to hide.
+    ToC     = {Primary = set, Figures = set, Tables = set},%
+  },%
+  /Report/Supervisor/Name = {OFFEN: Betreuung},%
+}
+\newcommand{\MCISubmissionDate}{OFFEN: Abgabedatum}

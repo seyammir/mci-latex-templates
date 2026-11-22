@@ -1,0 +1,89 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{notes-template}[2026/11/22 Calculation assignment support]
+\RequirePackage{iftex}
+\ifLuaTeX\else
+  \PackageError{notes-template}{Use LuaLaTeX}{Compile with latexmk main.tex.}
+\fi
+\ifthenelse{\equal{\class@state}{Notes}}{}{%
+  \PackageError{notes-template}{Use mcidoc state=Notes}{This package is for the Notes starter.}}
+
+% Typography and language
+\RequirePackage{fontspec}
+\setmainfont{TeX Gyre Heros}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{Latin Modern Mono}
+\RequirePackage{microtype}
+\RequirePackage[unicode,hidelinks,pdfpagelabels]{hyperref}
+\RequirePackage{bookmark}
+\KOMAoptions{fontsize=11pt,parskip=half,chapterprefix=false,numbers=noenddot}
+\geometry{a4paper,left=25mm,right=25mm,top=22mm,bottom=22mm,
+          headheight=16pt,headsep=7mm,footskip=11mm}
+\setstretch{1.15}
+\setlength{\emergencystretch}{1em}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\DeclareRobustCommand{\NotesText}[2]{%
+  \ifthenelse{\equal{\Global@Language}{DE}}{#1}{#2}}
+\ifthenelse{\equal{\Global@Language}{DE}}{%
+  \sisetup{locale=DE,separate-uncertainty=true}%
+  \pdfstringdefDisableCommands{\def\NotesText#1#2{#1}}%
+}{%
+  \sisetup{locale=US,separate-uncertainty=true}%
+  \pdfstringdefDisableCommands{\def\NotesText#1#2{#2}}%
+}
+\addto\captionsngerman{\renewcommand{\figurename}{Abb.}\renewcommand{\tablename}{Tab.}}
+\renewcommand*{\Global@StudentName}{\Student@Name}
+\hypersetup{pdftitle={\Global@Title},pdfauthor={\Student@Name}}
+
+% Exercises and calculation steps
+\renewcommand*{\thesection}{\arabic{section}}
+\renewcommand*{\sectionformat}{\NotesText{Aufgabe}{Problem}~\thesection\enskip}
+\RedeclareSectionCommand[beforeskip=\baselineskip,afterskip=0.5\baselineskip]{section}
+\setkomafont{section}{\large\bfseries}
+\numberwithin{equation}{section}
+\NewDocumentEnvironment{exercise}{O{}}{\section{#1}}{\par}
+\newcommand*{\given}{\par\noindent\NotesText{Gegeben}{Given}:\enspace\ignorespaces}
+\newcommand*{\find}{\par\noindent\NotesText{Gesucht}{Find}:\enspace\ignorespaces}
+\newcommand*{\solution}{\par\smallskip\noindent\NotesText{Lösung}{Solution}\par\nobreak}
+\NewDocumentCommand{\result}{m}{\begin{equation*}\boxed{#1}\end{equation*}}
+\NewDocumentCommand{\eqnref}{m}{\NotesText{Gl.}{Eq.}~\eqref{#1}}
+
+% Compact page heading and running footer
+\clearpairofpagestyles
+\KOMAoptions{headsepline=false,footsepline=false}
+\setlength{\footheight}{16pt}
+\ihead{\truncate{0.65\textwidth}{\Notes@Lecture}}
+\ohead{\truncate{0.30\textwidth}{\NotesSheet}}
+\ifoot*{\truncate{0.75\textwidth}{\Student@Name}}
+\ofoot*{\pagemark}
+\RenewDocumentCommand{\MakeTitlePage}{}{%
+  \begingroup
+    \setlength{\parindent}{0pt}%
+    \setlength{\parfillskip}{0pt plus 1fil}%
+    {\small\Notes@Lecture\hfill\NotesSheet\par}
+    \smallskip
+    {\LARGE\bfseries\Global@Title\par}
+    \smallskip
+    {\small\Student@Name\enspace\textbar\enspace
+      \NotesText{Matrikelnummer}{Student ID}: \Global@StudentID\par
+      \NotesText{Abgabe}{Due date}: \NotesDate\par}
+    \smallskip\hrule\medskip
+  \endgroup
+  \thispagestyle{plain.scrheadings}}
+\RenewDocumentCommand{\TableOfContents}{}{%
+  \section*{\contentsname}\@starttoc{toc}}
+\RenewDocumentCommand{\Preamble}{}{%
+  \NotesText{\selectlanguage{ngerman}}{\selectlanguage{english}}%
+  \setlength{\parskip}{4pt plus 1pt minus 1pt}%
+  \setlength{\abovedisplayskip}{6pt plus 2pt minus 1pt}%
+  \setlength{\belowdisplayskip}{6pt plus 2pt minus 1pt}%
+  \setlength{\abovedisplayshortskip}{3pt plus 1pt}%
+  \setlength{\belowdisplayshortskip}{6pt plus 2pt minus 1pt}%
+  \pagestyle{scrheadings}%
+  \ifNotesContents\pagenumbering{Roman}\else\pagenumbering{arabic}\fi
+  \MakeTitlePage
+  \ifNotesContents
+    \TableOfContents\clearpage\pagenumbering{arabic}%
+  \fi}
+\endinput

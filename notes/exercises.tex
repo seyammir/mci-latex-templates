@@ -1,0 +1,49 @@
+\begin{exercise}[Widerstand und Leistung]
+\label{ex:resistance}
+\given $U=\qty{12.0}{\volt}$, $I=\qty{0.150}{\ampere}$.
+Es wird ein idealer ohmscher Widerstand bei konstanter Temperatur betrachtet.
+\find Widerstand $R$ in \unit{\ohm} und elektrische Leistung $P$ in \unit{\watt}.
+\solution
+Mit den vorgegebenen Rechengrößen wird in \eqnref{eq:resistance} und
+\eqnref{eq:power} gerechnet:
+\begin{align}
+  R &= \frac{U}{I}
+     = \frac{\qty{12.0}{\volt}}{\qty{0.150}{\ampere}}
+     = \qty{80.0}{\ohm}, \label{eq:resistance}\\
+  P &= UI
+     = \qty{12.0}{\volt}\cdot\qty{0.150}{\ampere}
+     = \qty{1.80}{\watt}. \label{eq:power}
+\end{align}
+\result{R=\qty{80.0}{\ohm},\qquad P=\qty{1.80}{\watt}}
+Die Werte sind frei gewählte Rechengrößen, keine Messdaten.
+\end{exercise}
+
+\begin{exercise}[Lineares Gleichungssystem]
+\label{ex:system}
+\given Das Gleichungssystem in \eqnref{eq:system}; $x$ und $y$ sind dimensionslos.
+\find Die Unbekannten $x$ und $y$.
+\begin{equation}
+  \begin{aligned}
+    2x+y &= 7,\\
+    x-y  &= 2.
+  \end{aligned}
+  \label{eq:system}
+\end{equation}
+\solution
+Durch Addition beider Gleichungen entfällt $y$:
+\begin{align*}
+  (2x+y)+(x-y) &= 7+2,\\
+  3x &= 9 \quad\Longrightarrow\quad x=3.
+\end{align*}
+Durch Einsetzen in die zweite Gleichung wird $y$ bestimmt:
+\begin{equation*}
+  y=x-2=3-2=1.
+\end{equation*}
+\result{x=3,\qquad y=1}
+Die Probe ergibt $2\cdot3+1=7$ und $3-1=2$.
+\end{exercise}
+
+\paragraph*{\NotesText{Formelzeichen}{Symbols}}
+$U$: Spannung in \unit{\volt}; $I$: Stromstärke in \unit{\ampere};
+$R$: Widerstand in \unit{\ohm}; $P$: Leistung in \unit{\watt};
+$x$: erste Unbekannte, dimensionslos; $y$: zweite Unbekannte, dimensionslos.

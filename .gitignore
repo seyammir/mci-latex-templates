@@ -1,0 +1,18 @@
+# LaTeX build artifacts; source and final preview PDFs remain visible.
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.lof
+*.lot
+*.lol
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+aux-*.abs
+aux-*.ack
+tmp/

@@ -1,0 +1,24 @@
+% Preserve the % line endings in this configuration.
+\newif\ifMCIBioscience
+\MCIBiosciencefalse
+
+\SetMCI{%
+  StudentName = {Name = {OFFEN: Vorname Nachname}},%
+  StudentID   = {OFFEN: Matrikelnummer},%
+  Degree      = BSc,% BSc -> bachelor's; MSc -> master's thesis.
+  Language    = DE,% German thesis: German + English abstracts.
+  Department  = MECH,% Check applicability for another department.
+  Title       = {OFFEN: Titel der Abschlussarbeit},%
+  Thesis = {%
+    StudyProgram = {OFFEN: Studiengang},%
+    Supervisor = {%
+      Name = {OFFEN: Betreuung}, Prefix = {}, Postfix = {},%
+    },%
+    Location = {Innsbruck},%
+    Date     = {OFFEN: Datum},% Actual signing date; not the build date.
+    Novelty  = set,% Class declaration, review before signing.
+    Embargo  = unset,% Enable only an approved embargo.
+    ToC = {Primary = set, Figures = set, Tables = set},%
+    Bibliography = {Print = unset},% Printed explicitly in main.tex.
+  },%
+}
